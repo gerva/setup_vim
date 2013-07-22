@@ -49,7 +49,8 @@ sync_repo hdima/python-syntax.git
 sync_repo altercation/vim-colors-solarized.git
 # disabled because it requires Vim 7.3.584+
 #sync_repo Valloric/YouCompleteMe 
-sync_repo scrooloose/syntastic
+#sync_repo scrooloose/syntastic.git
+sync_repo klen/python-mode.git
 
 # backup and updating vimrc
 create_link _vimrc
