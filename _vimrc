@@ -13,6 +13,9 @@ set history=1000                " Store a ton of history (default is 20)
 set spell                       " spell checking on
 set hidden                      " allow buffer switching without saving
 
+                                " after upgrading to vim 7.4
+set backspace=2                 " http://vim.wikia.com/wiki/Backspace_and_delete_problems
+
 " show 80 chars limit
 if exists('+colorcolumn')
   set colorcolumn=80,160
@@ -54,6 +57,7 @@ let g:nerdtree_tabs_open_on_gui_startup=0
 
 " python-mode
 let g:pymode_lint_ignore = "E501"
+let g:pymode_lint_checker = "pyflakes,pep8"
 
 " Solarized dark
 syntax enable

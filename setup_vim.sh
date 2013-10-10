@@ -7,21 +7,28 @@ GITHUB="https://github.com"
 VIM_BUNDLE_DIR="$HOME/.vim/bundle"
 
 function sync_repo {
-   mkdir -p "$VIM_BUNDLE_DIR"
-   REPO_NAME=$1
-   LOCAL_REPO_NAME="$(echo "$REPO_NAME" | sed 's!.*/!!' | sed 's/\.git//')"
-   echo " * $LOCAL_REPO_NAME"
-   LOCAL_DIR="$VIM_BUNDLE_DIR/$LOCAL_REPO_NAME"
-   if [ -e "$LOCAL_DIR" ] 
-   then
-       cd "$LOCAL_DIR"
-       git pull origin master > /dev/null 2&>1
-       git submodule update --init --recursive > /dev/null 2&>1
-   else
-       cd "$VIM_BUNDLE_DIR"
-       git clone "$GITHUB/$REPO_NAME" > /dev/null 2>&1
-       git submodule update --init --recursive > /dev/null 2>&1
-   fi
+    mkdir -p "$VIM_BUNDLE_DIR"
+    REPO_NAME=$1
+    LOCAL_REPO_NAME="$(echo "$REPO_NAME" | sed 's!.*/!!' | sed 's/\.git//')"
+    echo " * $LOCAL_REPO_NAME"
+    LOCAL_DIR="$VIM_BUNDLE_DIR/$LOCAL_REPO_NAME"
+    if [ ! -e "$LOCAL_DIR" ]
+    then
+        cd "$VIM_BUNDLE_DIR"
+        git clone "$GITHUB/$REPO_NAME" > /dev/null 2>&1
+    fi
+    cd "$LOCAL_DIR"
+    git pull origin master > /dev/null 2>&1
+    if [ -e install.sh ]
+    then
+        echo "   + excuting install script"
+        ./install.sh > /dev/null 2>&1
+        if [ $? != 0  ]
+        then
+            echo "bad exit code :("
+        fi
+    fi
+    git submodule update --init --recursive > /dev/null 2>&1
 }
 
 function create_link {
@@ -49,6 +56,9 @@ sync_repo hdima/python-syntax.git
 sync_repo altercation/vim-colors-solarized.git
 sync_repo klen/python-mode.git
 sync_repo millermedeiros/vim-statline.git
+sync_repo kien/ctrlp.vim
+#sync_repo Valloric/YouCompleteMe
+
 
 # backup and updating vimrc
 create_link _vimrc
