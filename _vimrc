@@ -75,6 +75,7 @@ let ropevim_extended_complete = 1
 let g:ropevim_autoimport_modules = ["os.*","traceback","django.*", "xml.etree"]
 imap <C-space> <C-R>=RopeCodeAssistInsertMode()<CR>
 "Now pressing Ctrl+Space will bring up the rope completion menu.
+" http://stackoverflow.com/questions/19473378/how-to-make-c-space-work-in-terminal-app-on-mac
 
 " Rope AutoImport and OrganizeImport
 nnoremap <C-S-o> :RopeOrganizeImports<CR>0<CR><CR>
