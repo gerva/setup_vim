@@ -4,7 +4,6 @@ set tabstop=4
 set shiftwidth=4
 set expandtab
 set nu
-set paste
 set nocompatible
 set shortmess+=filmnrxoOtT      " abbrev. of messages (avoids 'hit enter')
 set viewoptions=folds,options,cursor,unix,slash " better unix / windows compatibility
@@ -37,6 +36,8 @@ set statusline+=%9*\ col:%03c\                            "Colnr
 set statusline+=%0*\ \ %m%r%w\ %P\ \                      "Modified? Readonly? Top/bot.
 set laststatus=2
 
+" U serious? hardcore mode!
+
 " Pathogen
 execute pathogen#infect()
 filetype plugin indent on
@@ -58,9 +59,50 @@ let g:nerdtree_tabs_open_on_gui_startup=0
 " python-mode
 let g:pymode_lint_ignore = "E501"
 let g:pymode_lint_checker = "pyflakes,pep8"
+let g:pymode = 1
+
+set statusline+=%#warningmsg#
+set statusline+=%{SyntasticStatuslineFlag()}
+set statusline+=%*
+let g:syntastic_auto_loc_list=1
+let g:syntastic_loc_list_height=5
+
+" ropevim (from python mode)
+" http://stackoverflow.com/questions/6724619/python-autocompletion-on-object-instances-in-vim
+" Rope AutoComplete
+let ropevim_vim_completion = 1
+let ropevim_extended_complete = 1
+let g:ropevim_autoimport_modules = ["os.*","traceback","django.*", "xml.etree"]
+imap <C-space> <C-R>=RopeCodeAssistInsertMode()<CR>
+"Now pressing Ctrl+Space will bring up the rope completion menu.
+
+" Rope AutoImport and OrganizeImport
+nnoremap <C-S-o> :RopeOrganizeImports<CR>0<CR><CR>
+nnoremap <C-S-i> :RopeAutoImport<CR>
+
+
+" Rope Menu
+menu Python.Create\ Package :RopeCreatePackage<CR>
+menu Python.Create\ Module :RopeCreateModule<CR>
 
 " Solarized dark
 syntax enable
 set background=dark
 let g:solarized_termcolors=256
 colorscheme solarized
+
+let mapleader = ','
+" fun stuff
+"set list
+"set listchars=tab:▸\ ,eol:¬,trail:⋅,extends:❯,precedes:❮
+"set showbreak=↪
+
+" Automatic reloading of .vimrc
+"autocmd! bufwritepost .vimrc source %
+
+" Better copy & paste
+"set pastetoggle=<F2>
+"set clipboard=unnamed
+" Highlight trailing white-spaces
+highlight WhitespaceEOL ctermbg=Red guibg=Red
+match WhitespaceEOL /\s\+$/
