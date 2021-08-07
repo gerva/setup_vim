@@ -1,64 +1,42 @@
 #!/bin/bash
 
+set -e
+
 cd "$( dirname "$0")"
 
 CURRENT_DIR="$(pwd)"
 GITHUB="https://github.com"
-VIM_BUNDLE_DIR="$HOME/.vim/bundle"
+MINPACK_REPO="$GITHUB/k-takata/minpac.git"
+MINPACK_DST="$HOME/.vim/pack/minpac/opt/minpac"
 
-function sync_repo {
-    mkdir -p "$VIM_BUNDLE_DIR"
-    REPO_NAME=$1
-    LOCAL_REPO_NAME="$(echo "$REPO_NAME" | sed 's!.*/!!' | sed 's/\.git//')"
-    echo " * $LOCAL_REPO_NAME"
-    LOCAL_DIR="$VIM_BUNDLE_DIR/$LOCAL_REPO_NAME"
-    if [ ! -e "$LOCAL_DIR" ]
-    then
-        cd "$VIM_BUNDLE_DIR"
-        git clone "$GITHUB/$REPO_NAME" > /dev/null 2>&1
-    fi
-    cd "$LOCAL_DIR"
-    git pull origin master > /dev/null 2>&1
-    if [ -e install.sh ]
-    then
-        echo "   + excuting install script"
-        ./install.sh > /dev/null 2>&1
-        if [ $? != 0  ]
-        then
-            echo "bad exit code :("
-        fi
-    fi
-    git submodule update --init --recursive > /dev/null 2>&1
+function install_minpack {
+   mkdir -p $(dirname "$MINPACK_DST")
+   if [ ! -e "$MINPACK_DST" ]
+   then
+     echo "* cloning minpac repo"
+     git clone "$MINPACK_REPO" "$MINPACK_DST" > /dev/null 2>&1
+   else
+     echo "* updating minpac repo"
+     (cd "$MINPACK_DST" && git pull > /dev/null 2>&1)
+  fi
 }
 
 function create_link {
     local SRC="$CURRENT_DIR/$1"
     local DST="$HOME/${1/_/.}"
-
     if [ -e "${DST}" ] && [ ! -L "${DST}" ]; then
         mv "$DST" "backup/$DST-$(date +%s).backup"
     fi
-
     ln -sf "$SRC" "$DST"
 }
 
+function neovim_setup {
+   NEOVIM_CONF_DIR="$HOME/.config/nvim"
+   mkdir -p "$NEOVIM_CONF_DIR"
+   cp _neovim "$NEOVIM_CONF_DIR/init.vim"
+}
 
-# installing pathogen
-echo "Installing pathogen"
-mkdir -p ~/.vim/autoload ~/.vim/bundle; \
-curl -Sso ~/.vim/autoload/pathogen.vim \
-    https://raw.github.com/tpope/vim-pathogen/master/autoload/pathogen.vim
-
-# installing from github
-echo "Installing vim plugins:"
-sync_repo scrooloose/nerdtree.git
-sync_repo hdima/python-syntax.git
-sync_repo altercation/vim-colors-solarized.git
-sync_repo klen/python-mode.git
-sync_repo millermedeiros/vim-statline.git
-sync_repo kien/ctrlp.vim
-#sync_repo Valloric/YouCompleteMe
-
-
-# backup and updating vimrc
+install_minpack
+neovim_setup
 create_link _vimrc
+echo "* done, open vi and execute 'call minpac#update()'"
